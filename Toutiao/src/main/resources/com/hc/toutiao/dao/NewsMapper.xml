@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hc.toutiao.dao.NewsMapper">
+    <resultMap type="News" id="newsResult">
+        <result column="id" property="id"/>
+        <result column="title" property="title"/>
+        <result column="content" property="content"/>
+        <result column="image1" property="image1"/>
+        <result column="image2" property="image2"/>
+        <result column="image3" property="image3"/>
+        <result column="movie" property="movie"/>
+        <result column="release_time" property="releaseTime"/>
+        <result column="editor" property="editor"/>
+        <result column="read_count" property="readCount"/>
+        <result column="content_count" property="contentCount"/>
+        <result column="news_status" property="newsStatus"/>
+        <result column="news_sources" property="newsSources"/>
+        <result column="news_tag" property="newsTag"/>
+        <result column="original_url" property="originalUrl"/>
+        <association property="cateId" javaType="Category" column="cate_id" select="getCategoryById">
+        </association>
+    </resultMap>
+
+    <select id="getCategoryById" resultType="Category">
+        select id,cate_name cateName,note from nw_category where id=#{id}
+    </select>
+
+    <select id="findById" resultMap="newsResult">
+        select *
+        from nw_news
+        where id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="newsResult">
+        select *
+        from nw_news
+    </select>
+
+    <select id="findByNewsTag" resultMap="newsResult">
+        select * from nw_news where news_tag=#{param1} order by release_time desc limit #{param2} , #{param3}
+    </select>
+</mapper>

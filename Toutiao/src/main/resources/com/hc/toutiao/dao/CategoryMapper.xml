@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.hc.toutiao.dao.CategoryMapper">
+    <resultMap type="Category" id="categoryResult">
+        <result column="id" property="id"/>
+        <result column="cate_name" property="cateName"/>
+        <result column="note" property="note"/>
+    </resultMap>
+
+    <!-- 取得插入数据后的id -->
+    <insert id="save" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        insert into nw_category(cate_name,note)
+        values(#{cateName},#{note})
+    </insert>
+
+    <update id="update">
+        update nw_category
+        set cate_name = #{cateName},
+        note = #{note}
+        where id = #{id}
+    </update>
+
+    <delete id="delete">
+        delete from nw_category
+        where id = #{id}
+    </delete>
+
+    <select id="findById" resultMap="categoryResult">
+        select *
+        from nw_category
+        where id = #{id}
+    </select>
+
+    <select id="findAll" resultMap="categoryResult">
+        select *
+        from nw_category
+    </select>
+</mapper>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+    <!-- 1. 数据源 : DriverManagerDataSource -->
+<!--    <context:property-placeholder location="classpath:jdbc.properties"/>-->
+<!--    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--        <property name="driverClassName" value="${jdbc.driver}"></property>-->
+<!--        <property name="url" value="${jdbc.url}"></property>-->
+<!--        <property name="username" value="${jdbc.username}"></property>-->
+<!--        <property name="password" value="${jdbc.password}"></property>-->
+<!--    </bean>-->
+    <bean id="dataSource"
+          class="org.springframework.jdbc.datasource.DriverManagerDataSource">
+        <property name="driverClassName" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="url" value="jdbc:mysql://localhost:3306/toutiao?serverTimezone=UTC&amp;characterEncoding=utf8&amp;useUnicode=true&amp;useSSL=false"/>
+        <property name="username" value="root"/>
+        <property name="password" value="a1402993740"/>
+    </bean>
+
+
+    <!--
+		2. mybatis的SqlSession的工厂: SqlSessionFactoryBean
+			dataSource / typeAliasesPackage
+	-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="typeAliasesPackage" value="com.hc.toutiao.pojo"/>
+    </bean>
+
+    <!--
+		3. mybatis自动扫描加载Sql映射文件 : MapperScannerConfigurer
+			sqlSessionFactory / basePackage
+	-->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.hc.toutiao.dao"/>
+        <property name="sqlSessionFactory" ref="sqlSessionFactory"/>
+    </bean>
+
+    <!-- 4. 事务管理 : DataSourceTransactionManager -->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!-- 5. 使用声明式事务 -->
+    <tx:annotation-driven transaction-manager="txManager" />
+
+    <context:component-scan base-package="com.hc.toutiao.service"></context:component-scan>
+
+<!--    集成springMVC-->
+    <context:component-scan base-package="com.hc.toutiao.controller"></context:component-scan>
+    <!--启动注解-->
+    <mvc:annotation-driven />
+
+    <!--静态资源访问不了的处理-->
+    <mvc:default-servlet-handler />
+    <!--<mvs:resources mapping="/images/**" location="/images/"></mvs:resources>-->
+    <!--<mvs:resources mapping="/js/**" location="/js/"></mvs:resources>-->
+
+    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+        <property name="prefix">
+            <value>/WEB-INF/views/</value>
+        </property>
+        <property name="suffix">
+            <value>.jsp</value>
+        </property>
+    </bean>
+
+    <!--配置json转换器，返回json数据用到-->
+    <bean class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter"/>
+            </list>
+        </property>
+    </bean>
+
+    <!--文件上传配置-->
+    <bean id="multipartResolver"
+          class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="defaultEncoding" value="utf-8" />
+        <property name="maxUploadSize" value="100242880" />
+        <property name="maxInMemorySize" value="40960" />
+    </bean>
+
+
+
+</beans>
